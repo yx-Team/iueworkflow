@@ -31,10 +31,16 @@ export default {
       version: require('../../../../package.json').version
     }
   },
+  created () {
+    // storage.clear('projectData')
+    // storage.clear('workspace')
+    // 加载storage的数据
+    this.$store.dispatch('firstProjectData')
+  },
   methods: {
 
     showCreateGulp () {
-      if (storage.get('projectData')) {
+      if (storage.get('projectData') && storage.get('projectData').length && !this.$store.state.createGulp.workspaceFlag) {
         this.$router.push({name: 'List'})
         return
       }

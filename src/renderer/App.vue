@@ -2,9 +2,7 @@
   <div class="app">
     
     <transition :name="page">
-      
         <router-view></router-view>
-      
     </transition>
     <div class="page-move-top" :class="{'is-active':showCreate}">
         <create-gulp></create-gulp>
@@ -19,7 +17,7 @@ export default {
   name: 'iue',
   data () {
     return {
-      page: 'page-left'
+      page: ''
     }
   },
   computed: {
@@ -29,15 +27,11 @@ export default {
   },
   watch: {
     $route (to, from) {
-      // if (to.name === 'CreateGulp' && from.name === 'Home') {
-      //   this.page = 'page-top'
-      //   return false
-      // }
-      // if (to.name === 'Home' && from.name === 'CreateGulp') {
-      //   this.page = 'page-bottom'
-      //   return false
-      // }
-
+      // 第一次进入，不执行动画
+      if (from.name === null) {
+        this.page = ''
+        return false
+      }
       if (to.meta.level < from.meta.level) {
         this.page = 'page-right'
         return false

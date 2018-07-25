@@ -1,3 +1,4 @@
+import {Message, MessageBox} from 'element-ui'
 /**
  * localStorage
  */
@@ -15,4 +16,30 @@ export const storage = {
     localStorage.removeItem(key)
   }
 
+}
+/**
+ * 提示
+ * @param {*} type 类型
+ * @param {*} val 文本
+ */
+export function tips (val, type = 'success') {
+  Message({
+    message: val,
+    type: type,
+    customClass: 'iue-message-tips',
+    center: true
+  })
+}
+
+export function Confirm (val, callback, cancelCallback, type = 'warning') {
+  MessageBox.confirm(val, '提示', {
+    customClass: 'iue-confirm',
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    callback && callback()
+  }).catch(() => {
+    cancelCallback && cancelCallback()
+  })
 }

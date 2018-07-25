@@ -19,7 +19,7 @@ body {
   }
   .iue-message-tips .el-message__content{font-size: 12px!important;}
   .iue-confirm{
-    width: 260px;
+    width: 260px!important;
   }
   .page-move{
     position: absolute;

@@ -1,6 +1,8 @@
 import {storage} from '@/lib/utils'
 const state = {
-  projectData: []
+  projectData: [],
+  workspace: '',
+  workspaceFlag: false
 }
 const mutations = {
   addProjectData (state, obj) {
@@ -11,15 +13,32 @@ const mutations = {
   },
   concatProjectData (state, data) {
     return (state.projectData = data)
+  },
+  setWorkSpace (state, val) {
+    return (state.workspace = val)
+  },
+  setWorkSpaceFlag (state, flag) {
+    return (state.workspaceFlag = flag)
   }
 }
 const actions = {
+  // 第一次获取数据
   firstProjectData ({commit}) {
-    let data = storage.get('projectData')
+    let data = storage.get('projectData') || []
+    let workspace = storage.get('workspace')
+
     if (data) {
-      return commit('concatProjectData', data)
+      commit('concatProjectData', data)
+    }
+    // 如果存在workspace，就设置workspace得值，不存在，就显示设置工作空间界面
+    if (workspace) {
+      commit('setWorkSpace', workspace)
+      commit('setWorkSpaceFlag', false)
+    } else {
+      commit('setWorkSpaceFlag', true)
     }
   },
+  // 添加项目数据
   addProjectData ({commit, dispatch, state}, obj) {
     return new Promise((resolve, reject) => {
       commit('addProjectData', obj)
@@ -30,6 +49,7 @@ const actions = {
       }, 100)
     })
   },
+  // 删除项目数据
   delProjectData ({commit, dispatch}, index) {
     return new Promise((resolve, reject) => {
       commit('delProjectData', index)
@@ -39,6 +59,12 @@ const actions = {
         })
       }, 100)
     })
+  },
+  // 设置workspace到localstroage
+  setWorkSpace ({commit}, val) {
+    commit('setWorkSpace', val)
+    commit('setWorkSpaceFlag', false)
+    storage.set('workspace', val)
   },
   getData () {
     return storage.get('projectData')

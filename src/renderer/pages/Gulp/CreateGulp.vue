@@ -1,5 +1,9 @@
 <template>
-    <div class="create-gulp page-move">
+    <div class="create-gulp page-move"
+    v-loading="loading"
+    element-loading-text="拼命解压中..."
+    element-loading-background="rgba(0, 0, 0, 0.8)"
+    >
         <i-header>
             <div class="back" @click="hideCreateGulp"><i class="el-icon-back"></i> 返回</div>
         </i-header>
@@ -10,12 +14,31 @@
             <H1>Gulp Mini项目</H1>
             <H5>支持postss px2rem flexibel</H5>
         </div>
-        <div class="form">
+        <!-- 工作空间 -->
+        <div class="form" v-if="workspaceFlag">
+          <div class="form-item">
+                <div class="label">工作空间</div>
+                <div class="con">
+                    <el-input disabled v-model="work.dir" placeholder="请选择工作空间目录"></el-input>
+                    <div class="arrow" @click="opendir('work')"><i class="el-icon-arrow-down"></i></div>
+                </div>
+            </div>
+            <div class="form-item">
+                <div class="label">解压类型</div>
+                <div class="con radio-con">
+                    <el-radio v-model="work.type" label="手动">手动</el-radio>
+                    <el-radio v-model="work.type" label="自动">自动（速度较慢）</el-radio>
+                </div>
+            </div>
+            <el-button type="primary" @click="nextStep">下一步</el-button>
+        </div>
+        <!-- 项目设置 -->
+        <div class="form" v-else>
             <div class="form-item">
                 <div class="label">项目目录</div>
                 <div class="con">
                     <el-input disabled v-model="form.dir" placeholder="请选择项目目录"></el-input>
-                    <div class="arrow" @click="opendir"><i class="el-icon-arrow-down"></i></div>
+                    <div class="arrow" @click="opendir('project')"><i class="el-icon-arrow-down"></i></div>
                 </div>
             </div>
             <div class="form-item">
@@ -31,23 +54,30 @@
                     <el-radio v-model="form.type" label="2">PC端</el-radio>
                 </div>
             </div>
-            <el-button type="primary" @click="toList">立即创建</el-button>
+            <el-button type="primary" @click="createFile">立即创建</el-button>
         </div>
     </div>
 </template>
 
 <script>
 import iHeader from '@/components/Header/Header'
-// import {storage} from '@/lib/utils'
 import projectDataTpl from './projectDataTpl'
-import {mapState} from 'vuex'
-const ipc = require('electron').ipcRenderer
-
+import { mapState } from 'vuex'
+import { tips } from '@/lib/utils'
+import code from '../../../main/utils/code'
+import {shell, ipcRenderer} from 'electron'
+const uuidv1 = require('uuid/v1')
 export default {
   name: 'CreateGulp',
   data () {
     return {
+      loading: false,
+      work: {
+        dir: '',
+        type: '手动'
+      },
       form: {
+        id: '',
         dir: '',
         name: '',
         type: '1'
@@ -56,50 +86,93 @@ export default {
   },
   computed: {
     ...mapState({
-      'projectData': state => state.createGulp.projectData
+      'projectData': state => state.createGulp.projectData,
+      'workspaceFlag': state => state.createGulp.workspaceFlag,
+      'workspace': state => state.createGulp.workspace || ''
     })
+  },
+  watch: {
+    workspaceFlag (val) {
+      if (val === true) {
+        this.work.dir = this.workspace
+      }
+    }
   },
   mounted () {
     let _this = this
-    ipc.on('selected-directory', function (event, path) {
-      _this.form.dir = path.toString()
+    ipcRenderer.on('notice', function (event, data) {
+      switch (data.code) {
+        case code.errorCode:
+          tips(data.msg, 'warning')
+          break
+        case code.copySuccess:
+          _this.toList(data.msg)
+          break
+        case code.copyNodeSuccess:
+          _this.loading = false
+          _this.$store.dispatch('setWorkSpace', _this.work.dir)
+
+          if (data.type === '手动') {
+            tips('请在工作空间解压node_module', 'warning')
+            setTimeout(() => {
+              shell.openItem(_this.work.dir)
+            }, 500)
+          } else if (data.type === '自动') {
+
+          }
+          if (_this.projectData.length) {
+            _this.$router.push({name: 'List'})
+            _this.$store.commit('setShowCreate', false)
+          }
+          break
+        case code.selectSuccess:
+          _this.form.dir = data.path.toString()
+          break
+        case code.selectSpaceSuccess:
+          _this.work.dir = data.path.toString()
+          break
+      }
     })
   },
   methods: {
-    toList () {
-      let _this = this
+    nextStep () {
+      if (this.work.dir.trim() === '') {
+        tips('工作空间不能为空！', 'warning')
+        return false
+      }
+      this.loading = true
+      ipcRenderer.send('copy-node-module', this.work)
+    },
+    createFile () {
       //   let stroageData = []
       if (this.form.dir.trim() === '') {
-        this.tips('目录不能为空！')
+        tips('目录不能为空！', 'warning')
         return false
       }
       if (this.form.name.trim() === '') {
-        this.tips('名称不能为空！')
+        tips('名称不能为空！', 'warning')
         return false
       }
-      this.$store.dispatch('addProjectData', this.form).then(() => {
-        _this.tips('添加成功！')
+      ipcRenderer.send('copy-file-unzip', this.form.dir)
+    },
+    toList (msg) {
+      let _this = this
+      _this.form.id = uuidv1()
+      _this.$store.dispatch('addProjectData', _this.form).then(() => {
+        tips(msg, 'success')
         _this.$router.push({name: 'List'})
         setTimeout(() => {
-        // 清空form数据
           _this.form = Object.assign({}, projectDataTpl)
           _this.$store.commit('setShowCreate', false)
         }, 400)
       })
     },
     hideCreateGulp () {
+      this.$store.commit('setWorkSpaceFlag', false)
       this.$store.commit('setShowCreate', false)
     },
-    opendir () {
-      ipc.send('open-file-dialog')
-    },
-    tips (val) {
-      this.$message({
-        message: val,
-        type: 'warning',
-        customClass: 'iue-message-tips',
-        center: true
-      })
+    opendir (type) {
+      ipcRenderer.send('open-file-dialog', type)
     }
   },
   components: {

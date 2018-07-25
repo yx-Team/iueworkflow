@@ -6,7 +6,8 @@ import {
   Button,
   Dialog,
   Message,
-  MessageBox
+  MessageBox,
+  Loading
 } from 'element-ui'
 
 Vue.use(Scrollbar)
@@ -14,7 +15,9 @@ Vue.use(Radio)
 Vue.use(Input)
 Vue.use(Button)
 Vue.use(Dialog)
+Vue.use(Loading.directive)
 
+Vue.prototype.$loading = Loading.service
 Vue.prototype.$message = Message
 Vue.prototype.$msgbox = MessageBox
 Vue.prototype.$alert = MessageBox.alert
