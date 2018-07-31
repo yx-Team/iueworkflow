@@ -2,7 +2,9 @@ import {storage} from '@/lib/utils'
 const state = {
   projectData: [],
   workspace: '',
-  workspaceFlag: false
+  workspaceFlag: false,
+  // 0-工作空间  1-创建项目  2-设置项目
+  projectSettingType: 0
 }
 const mutations = {
   addProjectData (state, obj) {
@@ -19,6 +21,9 @@ const mutations = {
   },
   setWorkSpaceFlag (state, flag) {
     return (state.workspaceFlag = flag)
+  },
+  setProjectSettingType (state, type) {
+    return (state.projectSettingType = type)
   }
 }
 const actions = {
@@ -33,9 +38,9 @@ const actions = {
     // 如果存在workspace，就设置workspace得值，不存在，就显示设置工作空间界面
     if (workspace) {
       commit('setWorkSpace', workspace)
-      commit('setWorkSpaceFlag', false)
+      // commit('setProjectSettingType', 1)
     } else {
-      commit('setWorkSpaceFlag', true)
+      commit('setProjectSettingType', 0)
     }
   },
   // 添加项目数据
@@ -63,7 +68,8 @@ const actions = {
   // 设置workspace到localstroage
   setWorkSpace ({commit}, val) {
     commit('setWorkSpace', val)
-    commit('setWorkSpaceFlag', false)
+    // commit('setProjectSettingType', 1)
+    // commit('setWorkSpaceFlag', false)
     storage.set('workspace', val)
   },
   getData () {

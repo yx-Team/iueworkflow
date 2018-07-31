@@ -42,7 +42,7 @@
                         <div class="tool">
                             <el-button size="mini" title="删除" @click="del(index)"><i class="el-icon-delete"></i></el-button>
                             <el-button size="mini" title="打开目录" @click="open(item.dir)"><i class="el-icon-view"></i></el-button>
-                            <el-button size="mini" title="项目设置"><i class="el-icon-setting"></i></el-button>
+                            <el-button size="mini" title="项目设置" @click="handleSetting(item)"><i class="el-icon-setting"></i></el-button>
                         </div>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
         <div class="fixed-btn" @click="handleCreateGulp" v-if="listCount>3" title="新增项目">
             <i class="el-icon-plus"></i>
         </div>
-        <div class="fixed-btn fixed-btn-setting" @click="handleSetting" title="设置工作空间">
+        <div class="fixed-btn fixed-btn-setting" @click="handleWorkspace" title="设置工作空间">
             <i class="el-icon-setting"></i>
         </div>
     </div>
@@ -138,11 +138,16 @@ export default {
   methods: {
     handleCreateGulp () {
       this.$store.commit('setShowCreate', true)
-      this.$store.commit('setWorkSpaceFlag', false)
+      this.$store.commit('setProjectSettingType', 1)
     },
-    handleSetting () {
+    handleWorkspace () {
       this.$store.commit('setShowCreate', true)
-      this.$store.commit('setWorkSpaceFlag', true)
+      this.$store.commit('setProjectSettingType', 0)
+    },
+    handleSetting (item) {
+      this.$store.commit('setShowCreate', true)
+      this.$store.commit('setProjectSettingType', 2)
+      ipcRenderer.send('read-config', item.dir + '\\config.json')
     },
     run (item) {
       this.kill()

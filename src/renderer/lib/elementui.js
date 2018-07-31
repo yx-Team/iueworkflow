@@ -3,6 +3,7 @@ import {
   Scrollbar,
   Radio,
   Input,
+  Switch,
   Button,
   Dialog,
   Message,
@@ -13,6 +14,7 @@ import {
 Vue.use(Scrollbar)
 Vue.use(Radio)
 Vue.use(Input)
+Vue.use(Switch)
 Vue.use(Button)
 Vue.use(Dialog)
 Vue.use(Loading.directive)

@@ -1,6 +1,7 @@
 <template>
     <div class="iue-title-bar header">
         <slot></slot>
+        <div class="iue-title-bar-title">{{title}}</div>
         <div class="handle-bar">
         <i class="el-icon-minus" @click="minimizeWindow"></i>
         <i class="el-icon-close" @click="closeWindow"></i>
@@ -14,6 +15,12 @@ import { remote } from 'electron'
 const { BrowserWindow } = remote
 export default {
   name: 'Header',
+  props: {
+    title: {
+      type: String,
+      default: ''
+    }
+  },
   methods: {
     minimizeWindow () {
       const win = BrowserWindow.getFocusedWindow()
@@ -39,8 +46,15 @@ export default {
   z-index: 99;
   height: 50px;
   -webkit-app-region: drag;
-}
-/* 关闭返回等按钮不能拖动 */
+  &-title{
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-size: 18px;
+    user-select: none;
+    cursor: move;
+  }
+  /* 关闭返回等按钮不能拖动 */
 .back {
   position: fixed;
   left: 20px;
@@ -92,4 +106,6 @@ export default {
   opacity: 1;
   transform: translateY(0);
 }
+}
+
 </style>

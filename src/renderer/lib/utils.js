@@ -17,6 +17,7 @@ export const storage = {
   }
 
 }
+
 /**
  * 提示
  * @param {*} type 类型

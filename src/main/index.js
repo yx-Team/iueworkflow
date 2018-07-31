@@ -30,11 +30,11 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 567,
     width: 375,
-    useContentSize: false,
-    frame: false,
-    resizable: false,
-    maximizable: false,
-    icon: '../../build/icons/256x256.png',
+    frame: true,
+    // useContentSize: false,
+    // resizable: false,
+    // maximizable: false,
+    // icon: '../../build/icons/256x256.png',
     backgroundColor: '#fff'
   })
 
@@ -172,7 +172,23 @@ ipcMain.on('kill', (event, pid) => {
     return event.sender.send('notice', {code: code.killSuccess, msg: '进程结束成功'})
   })
 })
-
+// 读取配置
+ipcMain.on('read-config', (event, path) => {
+  readFile(path, 'utf8').then(data => {
+    console.log(data)
+    return event.sender.send('notice', {code: code.readConfigSuccess, msg: '配置读取成功', config: {data: data, path: path}})
+  }).catch(err => {
+    return event.sender.send('notice', {code: code.errorCode, msg: err})
+  })
+})
+ipcMain.on('write-config', (event, config) => {
+  console.log(config)
+  writeFile(config.path, config.data).then(() => {
+    return event.sender.send('notice', {code: code.writeConfigSuccess, msg: '保存成功'})
+  }).catch(err => {
+    return event.sender.send('notice', {code: code.errorCode, msg: err})
+  })
+})
 /**
  * Auto Updater
  *

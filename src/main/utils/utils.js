@@ -6,9 +6,9 @@ const extract = require('extract-zip')
  * 读取文件
  * @param {*} path 路径
  */
-export function readFile (path) {
+export function readFile (path, options = '') {
   return new Promise((resolve, reject) => {
-    fs.readFile(path, (err, data) => {
+    fs.readFile(path, options, (err, data) => {
       if (err) return reject(err)
       return resolve(data)
     })
