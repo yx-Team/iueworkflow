@@ -12,6 +12,7 @@
 <script>
 // 渲染进程通过 remote 可以获取当前窗口
 import { remote } from 'electron'
+import {Confirm} from '@/lib/utils'
 const { BrowserWindow } = remote
 export default {
   name: 'Header',
@@ -28,9 +29,11 @@ export default {
       win.minimize()
     },
     closeWindow () {
-      const win = BrowserWindow.getFocusedWindow()
-      // 窗口关闭
-      win.close()
+      Confirm('确定要退出吗~v~', function () {
+        const win = BrowserWindow.getFocusedWindow()
+        // 窗口关闭
+        win.close()
+      })
     }
   }
 }

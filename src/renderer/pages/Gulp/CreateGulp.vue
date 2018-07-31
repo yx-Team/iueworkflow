@@ -53,7 +53,7 @@
                 <div class="label">项目类型</div>
                 <div class="con radio-con">
                     <el-radio v-model="form.type" label="1">移动端</el-radio>
-                    <el-radio v-model="form.type" label="2">PC端</el-radio>
+                    <!-- <el-radio v-model="form.type" label="2">PC端</el-radio> -->
                 </div>
             </div>
             <el-button type="primary" @click="createFile">立即创建</el-button>

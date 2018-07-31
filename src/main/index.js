@@ -30,11 +30,12 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 567,
     width: 375,
-    frame: true,
-    // useContentSize: false,
-    // resizable: false,
-    // maximizable: false,
-    // icon: '../../build/icons/256x256.png',
+    show: false,
+    frame: false,
+    useContentSize: false,
+    resizable: false,
+    maximizable: false,
+    icon: '../../build/icons/256x256.png',
     backgroundColor: '#fff'
   })
 
@@ -42,6 +43,10 @@ function createWindow () {
 
   mainWindow.on('closed', () => {
     mainWindow = null
+  })
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show()
+    mainWindow.focus()
   })
 }
 
