@@ -2,9 +2,12 @@ import {storage} from '@/lib/utils'
 const state = {
   projectData: [],
   workspace: '',
-  workspaceFlag: false,
   // 0-工作空间  1-创建项目  2-设置项目
-  projectSettingType: 0
+  projectSettingType: 0,
+  // 浏览器运行进程号pid
+  pid: -1,
+  // 运行的项目id
+  projectId: ''
 }
 const mutations = {
   addProjectData (state, obj) {
@@ -19,11 +22,14 @@ const mutations = {
   setWorkSpace (state, val) {
     return (state.workspace = val)
   },
-  setWorkSpaceFlag (state, flag) {
-    return (state.workspaceFlag = flag)
-  },
   setProjectSettingType (state, type) {
     return (state.projectSettingType = type)
+  },
+  setPid (state, val) {
+    return (state.pid = val)
+  },
+  setProjectId (state, val) {
+    return (state.projectId = val)
   }
 }
 const actions = {
@@ -38,7 +44,6 @@ const actions = {
     // 如果存在workspace，就设置workspace得值，不存在，就显示设置工作空间界面
     if (workspace) {
       commit('setWorkSpace', workspace)
-      // commit('setProjectSettingType', 1)
     } else {
       commit('setProjectSettingType', 0)
     }
@@ -68,13 +73,13 @@ const actions = {
   // 设置workspace到localstroage
   setWorkSpace ({commit}, val) {
     commit('setWorkSpace', val)
-    // commit('setProjectSettingType', 1)
-    // commit('setWorkSpaceFlag', false)
     storage.set('workspace', val)
   },
+  // 获取localstorage存储的项目数据
   getData () {
     return storage.get('projectData')
   },
+  // 设置项目数据
   setData ({state}, val) {
     return new Promise((resolve, reject) => {
       storage.set('projectData', state.projectData)

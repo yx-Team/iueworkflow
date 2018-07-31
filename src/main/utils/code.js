@@ -20,5 +20,7 @@ export default {
   // 读取配置
   readConfigSuccess: 9,
   // 写入配置
-  writeConfigSuccess: 10
+  writeConfigSuccess: 10,
+  // log输出
+  logCode: 11
 }

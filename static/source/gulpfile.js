@@ -188,8 +188,8 @@ gulp.task('html:build', function () {
     .pipe(gulpif(config.htmlminify.compress, htmlminify()))
     .pipe(gulp.dest(paths + '/' + config.build.html))
     .pipe(notify({
-      title: '云信构建工具',
-      message: '构建成功'
+      title: 'notice',
+      message: 'build success'
     }))
 })
 gulp.task('img:build', function () {
@@ -250,8 +250,8 @@ gulp.task('zip', function () {
     .src(paths + '/' + config.build.baseDir + '**')
     .pipe(zip(config.zip.name))
     .pipe(notify({
-      title: '云信构建工具',
-      message: 'zip打包成功'
+      title: 'notice',
+      message: 'zip sucess'
     }))
     .pipe(gulp.dest(paths))
 })

@@ -17,9 +17,9 @@
         </div>
         <el-scrollbar style="height:467px;">
             <div class="list">
-                <div class="list-item" :class="{'is-active':listAcitve===item.id}" v-for="(item,index) in searchList" :key="index">
+                <div class="list-item" :class="{'is-active':projectId===item.id}" v-for="(item,index) in searchList" :key="index">
                     <div class="list-item-top">
-                        <a v-if="listAcitve===item.id" :class="{'open':listAcitve===item.id}" href="javascript:;" @click="stop(item)">
+                        <a v-if="projectId===item.id" :class="{'open':projectId===item.id}" href="javascript:;" @click="stop(item)">
                             <i class="el-icon-loading"></i>
                             <span>运行中</span>
                         </a>
@@ -79,9 +79,8 @@ export default {
       loading: false,
       loadingText: '',
       search: '',
-      searchList: [],
-      listAcitve: '',
-      pid: -1
+      searchList: []
+    //   listAcitve: ''
     }
   },
   watch: {
@@ -104,7 +103,9 @@ export default {
   computed: {
     ...mapState({
       'list': state => state.createGulp.projectData,
-      'listCount': state => state.createGulp.projectData.length
+      'listCount': state => state.createGulp.projectData.length,
+      'pid': state => state.createGulp.pid,
+      'projectId': state => state.createGulp.projectId
     })
   },
   created () {
@@ -119,8 +120,7 @@ export default {
           _this.loading = false
           _this.loadingText = ''
           // 监听子进程pid
-          console.log(data.pid)
-          _this.pid = data.pid
+          _this.$store.commit('setPid', data.pid)
           tips(data.msg)
           break
         case code.buildSuccess:
@@ -133,6 +133,9 @@ export default {
         //   _this.pid = -1
           break
       }
+    })
+    ipcRenderer.on('log', (event, data) => {
+      console.log(data.msg)
     })
   },
   methods: {
@@ -153,7 +156,7 @@ export default {
       this.kill()
       this.loading = true
       this.loadingText = '运行中...'
-      this.listAcitve = item.id
+      this.$store.commit('setProjectId', item.id)
       let obj = {dir: item.dir, workspace: this.$store.state.createGulp.workspace}
       ipcRenderer.send('run-gulp-server', obj)
     },
@@ -194,10 +197,9 @@ export default {
       let pid = this.pid
       if (pid > 0) {
         ipcRenderer.send('kill', pid)
-        this.pid = -1
+        this.$store.commit('setPid', -1)
       }
-
-      this.listAcitve = ''
+      this.$store.commit('setProjectId', '')
     },
     open (path) {
       // 打开文件夹

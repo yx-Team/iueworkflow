@@ -127,9 +127,12 @@ ipcMain.on('run-gulp-server', (event, obj) => {
   child.stderr.on('data', function (data) {
     let str = data.toString()
     console.error('exec error: ' + str)
+    event.sender.send('log', {code: code.logCode, msg: str})
   })
   child.stdout.on('data', function (data) {
-    console.log(data.toString())
+    let str = data.toString()
+    console.log(str)
+    event.sender.send('log', {code: code.logCode, msg: str})
     if (data.toString().split(' ').indexOf('Serving') > -1) {
       return event.sender.send('notice', {code: code.serverSuccess, msg: '运行成功', pid: child.pid})
     }
@@ -142,9 +145,12 @@ ipcMain.on('run-gulp-build', (event, obj) => {
   child.stderr.on('data', function (data) {
     let str = data.toString()
     console.error('exec error: ' + str)
+    event.sender.send('log', {code: code.logCode, msg: str})
   })
   child.stdout.on('data', function (data) {
-    console.log(data.toString())
+    let str = data.toString()
+    console.log(str)
+    event.sender.send('log', {code: code.logCode, msg: str})
     if (data.toString().split("Finished 'build'").length > 1) {
       return event.sender.send('notice', {code: code.buildSuccess, msg: '压缩成功'})
     }
@@ -157,9 +163,12 @@ ipcMain.on('run-gulp-zip', (event, obj) => {
   child.stderr.on('data', function (data) {
     let str = data.toString()
     console.error('exec error: ' + str)
+    event.sender.send('log', {code: code.logCode, msg: str})
   })
   child.stdout.on('data', function (data) {
-    console.log(data.toString())
+    let str = data.toString()
+    console.log(str)
+    event.sender.send('log', {code: code.logCode, msg: str})
     if (data.toString().split(' ').indexOf('Finished') > -1) {
       return event.sender.send('notice', {code: code.zipSuccess, msg: '打包成功'})
     }
