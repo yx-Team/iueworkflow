@@ -176,7 +176,7 @@ gulp.task('img', function () {
 })
 gulp.task('del', function () {
   return del([config.build.baseDir]).then(paths => {
-    console.log('删除得文件:\n', paths.join('\n'))
+    console.log('删除完成')
   })
 })
 /* -----------------------------build--------------------------------- */

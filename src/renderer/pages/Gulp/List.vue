@@ -55,11 +55,30 @@
                 <i-abnor height="400px">没有搜到相关项目</i-abnor>
             </div>
         </el-scrollbar>
-        <div class="fixed-btn" @click="handleCreateGulp" v-if="listCount>3" title="新增项目">
-            <i class="el-icon-plus"></i>
+        <!-- 右侧按钮 -->
+        <div class="side-btn">
+            <div class="fixed-btn" @click="handleCreateGulp" v-if="listCount>3" title="新增项目">
+                <i class="el-icon-plus"></i>
+            </div>
+            <div class="fixed-btn fixed-btn-cmd" @click="handleCmd" title="命令行工具">
+                <span class="text">终端</span>
+            </div>
+            <div class="fixed-btn fixed-btn-setting" @click="handleWorkspace" title="设置工作空间">
+                <i class="el-icon-setting"></i>
+            </div>
         </div>
-        <div class="fixed-btn fixed-btn-setting" @click="handleWorkspace" title="设置工作空间">
-            <i class="el-icon-setting"></i>
+        <!-- cmd -->
+        <div class="cmd" :class="{'is-active':cmdActive}">
+            <div class="cmd-title">
+                <span class="title">终端&lt;_</span>
+                <div>
+                    <i class="el-icon-delete" @click="clearCmd"></i>
+                    <i class="el-icon-close" @click="closeCmd"></i>
+                </div>
+            </div>
+            <textarea class="cmd-con" v-html="cmdCon">
+                
+            </textarea>
         </div>
     </div>
 </template>
@@ -79,8 +98,10 @@ export default {
       loading: false,
       loadingText: '',
       search: '',
-      searchList: []
-    //   listAcitve: ''
+      searchList: [],
+      //   cmd是否显示
+      cmdActive: false,
+      cmdCon: ''
     }
   },
   watch: {
@@ -114,6 +135,7 @@ export default {
   },
   mounted () {
     var _this = this
+    var $cmdcon = document.querySelector('.cmd-con')
     ipcRenderer.on('notice', (event, data) => {
       switch (data.code) {
         case code.serverSuccess:
@@ -135,6 +157,10 @@ export default {
       }
     })
     ipcRenderer.on('log', (event, data) => {
+      _this.cmdCon += `${data.msg}`
+      _this.$nextTick().then(() => {
+        $cmdcon.scrollTop = $cmdcon.scrollHeight
+      })
       console.log(data.msg)
     })
   },
@@ -151,6 +177,15 @@ export default {
       this.$store.commit('setShowCreate', true)
       this.$store.commit('setProjectSettingType', 2)
       ipcRenderer.send('read-config', item.dir + '\\config.json')
+    },
+    handleCmd () {
+      this.cmdActive = true
+    },
+    clearCmd () {
+      this.cmdCon = `清理成功~~\n`
+    },
+    closeCmd () {
+      this.cmdActive = false
     },
     run (item) {
       this.kill()
@@ -373,11 +408,13 @@ export default {
             }
         }
     }
-    .fixed-btn{
+    .side-btn{
         position: fixed;
         z-index: 99;
         right: 20px;
         bottom: 20px;
+    }
+    .fixed-btn{
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -388,10 +425,19 @@ export default {
         background-color: #3999ff;
         box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.3);
         transition: all .3s;
+        margin-top: 10px;
         cursor: pointer;
         &-setting{
+            background: #43cc99;
+            bottom: 70px;
+        }
+        &-cmd{
             background: #545454;
             bottom: 70px;
+            .text{
+                font-size: 12px;
+                color: #fff;
+            }
         }
         &:hover{
             transform: scale(1.2);
@@ -404,6 +450,46 @@ export default {
             color: #fff;
             transition: all .3s;
         }
+    }
+}
+
+.cmd{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    box-shadow: 0 0px 20px rgba(0,0,0,0.1);
+    background: #fff;
+    transform: translate3d(0,100%,0);
+    transition: all .3s;
+    &.is-active{
+        transform: translate3d(0,0,0);
+    }
+    &-title{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        height: 40px;
+        padding: 0 20px;
+        border-bottom: 1px solid #eee;
+        border-top: 1px solid #eee;
+        i{
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    }
+    &-con{
+        height: 160px;
+        padding: 10px 20px;
+        border: 0;
+        width: 100%;
+        box-sizing: border-box;
+        overflow-y: auto;
+        user-select: auto;
+        font-size: 10px;
+        font-family: "Microsoft YaHei", Helvetica, STHeiTi, Arial, sans-serif;
     }
 }
 </style>
